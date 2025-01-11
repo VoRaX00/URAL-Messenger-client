@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './Home.css';
 
 const Home = () => {
@@ -11,7 +11,7 @@ const Home = () => {
         setWs(socket);
 
         socket.onmessage = (event) => {
-            const newMessage = event.data;
+            const newMessage = JSON.parse(event.data); // Преобразуем строку в объект
             setMessages((prevMessages) => [...prevMessages, newMessage]);
         }
 
@@ -28,11 +28,11 @@ const Home = () => {
         }
     }, [])
 
-
-
     const handleSendMessage = () => {
         if (ws && inputValue.trim()) {
-            ws.send(inputValue);
+            ws.send(JSON.stringify({
+                message: inputValue
+            }));
             setInputValue('');
         }
     };
@@ -44,7 +44,13 @@ const Home = () => {
                     {messages.length > 0 ? (
                         messages.map((msg, index) => (
                             <div key={index} className="message">
-                                {msg}
+                                <div className="message-header">
+                                    <span className="message-address">{msg.address}</span>
+                                </div>
+                                <div className="message-body">{msg.message}</div>
+                                <div>
+                                    <span className="message-time">{msg.time}</span>
+                                </div>
                             </div>
                         ))
                     ) : (
